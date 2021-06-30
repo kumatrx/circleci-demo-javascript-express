@@ -6,37 +6,29 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@5'
-      - run:
-          name: build
-          command: npm run lint
+      - run: npm i
+      - run: npm run lint
   test:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: test
-          command: npm run test
+      - run: npm i
+      - run: npm run test
   analyze:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: audit
-          command: npm audit
+      - run: npm audit
 
 workflows:
-  version: 2
-  build:
+  my_workflow:
     jobs:
       - build
-      - test
+      - test:
           requires:
             - build
-      - analyze
+      - analyze:
           requires:
             - test
