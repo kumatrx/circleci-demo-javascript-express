@@ -5,6 +5,10 @@ workflows:
   build:
     jobs:
       - build
+      - test
+          requires: build
+      - analyze
+          requires: test
 
 jobs:
   build:
@@ -27,8 +31,8 @@ jobs:
           paths:
             - ./node_modules
       - run:
-          name: test
-          command: npm test
+          name: build
+          command: npm run lint
       - run:
           name: code-coverage
           command: './node_modules/.bin/nyc report --reporter=text-lcov'
@@ -40,3 +44,23 @@ jobs:
           prefix: coverage
       - store_test_results:
           path: test-results.xml
+  test:
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/node:10.16.3
+      - image: mongo:4.2.0
+    steps:
+      - checkout
+      - run:
+          name: test
+          command: npm run test
+  analyze:
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/node:10.16.3
+      - image: mongo:4.2.0
+    steps:
+      - checkout
+      - run:
+          name: audit
+          command: npm audit
